@@ -1,8 +1,8 @@
-## MovieApp
+## CineFlix
 
 An Android movie discovery app built with Java, MVVM, and a clean layered architecture.
 
-MovieApp lets users browse popular movies, open rich details, view reviews and similar titles, play trailers, save favorites locally, and manage a simple local-auth profile with dark mode support.
+CineFlix lets users browse popular movies, open rich details, view reviews and similar titles, play trailers, save favorites locally, and manage a simple local-auth profile with dark mode support.
 
 ## Features
 
@@ -35,7 +35,8 @@ MovieApp lets users browse popular movies, open rich details, view reviews and s
 ## Requirements
 
 - Android Studio (latest stable recommended)
-- JDK 11
+- JDK 17 or newer (recommended for AGP 8.13.2)
+- Java source/target compatibility: 11
 - Android SDK:
   - `compileSdk = 36`
   - `targetSdk = 36`
