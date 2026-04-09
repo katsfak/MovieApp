@@ -1,18 +1,21 @@
 package com.example.movieapp.ui.auth;
 
-import android.app.Application;
 import android.text.TextUtils;
 import android.util.Patterns;
 
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 
 import com.example.movieapp.data.auth.AuthManager;
 
-public class AuthViewModel extends AndroidViewModel {
+import dagger.hilt.android.lifecycle.HiltViewModel;
+
+import javax.inject.Inject;
+
+@HiltViewModel
+public class AuthViewModel extends ViewModel {
 
     private final AuthManager authManager;
     private final MutableLiveData<LoginSignupUiState> _loginSignupUiState = new MutableLiveData<>(
@@ -22,9 +25,9 @@ public class AuthViewModel extends AndroidViewModel {
     private final MutableLiveData<ProfileUiState> _profileUiState = new MutableLiveData<>(ProfileUiState.idle());
     public final LiveData<ProfileUiState> profileUiState = _profileUiState;
 
-    public AuthViewModel(@NonNull Application application) {
-        super(application);
-        authManager = new AuthManager(application.getApplicationContext());
+    @Inject
+    public AuthViewModel(AuthManager authManager) {
+        this.authManager = authManager;
     }
 
     public void checkSession() {
@@ -68,8 +71,16 @@ public class AuthViewModel extends AndroidViewModel {
             return;
         }
 
-        authManager.signUp(email, password);
-        _loginSignupUiState.setValue(LoginSignupUiState.authenticated());
+        if (authManager.isEmailInUse(email)) {
+            _loginSignupUiState.setValue(LoginSignupUiState.error("This email is already registered."));
+            return;
+        }
+
+        if (authManager.signUp(email, password)) {
+            _loginSignupUiState.setValue(LoginSignupUiState.authenticated());
+        } else {
+            _loginSignupUiState.setValue(LoginSignupUiState.error("This email is already registered."));
+        }
     }
 
     public void loadProfile() {
@@ -98,12 +109,21 @@ public class AuthViewModel extends AndroidViewModel {
             return;
         }
 
-        authManager.updateCredentials(email, password);
-        _profileUiState.setValue(ProfileUiState.credentialsUpdated(
-                email,
-                maskPassword(password),
-                "Credentials updated successfully.",
-                authManager.isDarkModeEnabled()));
+        String currentEmail = authManager.getRegisteredEmail();
+        if (!email.equals(currentEmail) && authManager.isEmailInUse(email)) {
+            _profileUiState.setValue(ProfileUiState.error("This email is already in use by another account."));
+            return;
+        }
+
+        if (authManager.updateCredentials(email, password)) {
+            _profileUiState.setValue(ProfileUiState.credentialsUpdated(
+                    email,
+                    maskPassword(password),
+                    "Credentials updated successfully.",
+                    authManager.isDarkModeEnabled()));
+        } else {
+            _profileUiState.setValue(ProfileUiState.error("Could not update your account details."));
+        }
     }
 
     public void updateDarkMode(boolean enabled) {

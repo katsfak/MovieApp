@@ -14,6 +14,9 @@ import androidx.navigation.Navigation;
 import com.example.movieapp.R;
 import com.example.movieapp.databinding.SignupLayoutBinding;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class SignupFragment extends Fragment {
 
     private SignupLayoutBinding binding;
@@ -39,16 +42,14 @@ public class SignupFragment extends Fragment {
 
     private void setupSignupButton() {
         binding.signupButton.setOnClickListener(v -> {
-            String email = binding.signupEmailInput.getText().toString().trim();
-            String password = binding.signupPasswordInput.getText().toString().trim();
+            String email = String.valueOf(binding.signupEmailInput.getText()).trim();
+            String password = String.valueOf(binding.signupPasswordInput.getText()).trim();
             viewModel.signUp(email, password);
         });
     }
 
     private void setupLoginLink() {
-        binding.loginLinkButton.setOnClickListener(v -> {
-            Navigation.findNavController(v).navigateUp();
-        });
+        binding.loginLinkButton.setOnClickListener(v -> Navigation.findNavController(v).navigateUp());
     }
 
     private void showError(String message) {

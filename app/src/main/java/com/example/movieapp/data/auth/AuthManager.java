@@ -1,73 +1,95 @@
 package com.example.movieapp.data.auth;
 
-import android.content.Context;
-import android.content.SharedPreferences;
+import com.example.movieapp.data.database.UserDao;
+import com.example.movieapp.data.database.UserEntity;
+
+import javax.inject.Inject;
 
 public class AuthManager {
 
-    private static final String PREFS_NAME = "auth_prefs";
-    private static final String KEY_IS_LOGGED_IN = "is_logged_in";
-    private static final String KEY_USER_EMAIL = "user_email";
-    private static final String KEY_USER_PASSWORD = "user_password";
-    private static final String KEY_DARK_MODE_ENABLED = "dark_mode_enabled";
+    private final UserDao userDao;
 
-    private final SharedPreferences prefs;
-
-    public AuthManager(Context context) {
-        this.prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+    @Inject
+    public AuthManager(UserDao userDao) {
+        this.userDao = userDao;
     }
 
-    public void signUp(String email, String password) {
-        prefs.edit()
-                .putString(KEY_USER_EMAIL, email)
-                .putString(KEY_USER_PASSWORD, password)
-                .putBoolean(KEY_IS_LOGGED_IN, true)
-                .apply();
+    public boolean isEmailInUse(String email) {
+        return userDao.getUserByEmail(email) != null;
+    }
+
+    public boolean signUp(String email, String password) {
+        if (isEmailInUse(email)) {
+            return false;
+        }
+
+        userDao.clearLoggedInUsers();
+        userDao.insert(new UserEntity(0, email, password, true, false));
+        return true;
     }
 
     public boolean login(String email, String password) {
-        String storedEmail = prefs.getString(KEY_USER_EMAIL, "");
-        String storedPassword = prefs.getString(KEY_USER_PASSWORD, "");
-        boolean isValid = email.equals(storedEmail) && password.equals(storedPassword);
+        UserEntity user = userDao.getUserByEmail(email);
+        boolean isValid = user != null && password.equals(user.getPassword());
 
         if (isValid) {
-            prefs.edit().putBoolean(KEY_IS_LOGGED_IN, true).apply();
+            userDao.clearLoggedInUsers();
+            user.setLoggedIn(true);
+            userDao.update(user);
         }
         return isValid;
     }
 
     public void logout() {
-        prefs.edit().clear().apply();
+        userDao.clearLoggedInUsers();
     }
 
     public boolean isLoggedIn() {
-        return prefs.getBoolean(KEY_IS_LOGGED_IN, false);
-    }
-
-    public boolean hasRegisteredUser() {
-        return !prefs.getString(KEY_USER_EMAIL, "").isEmpty();
+        return userDao.getLoggedInUser() != null;
     }
 
     public String getRegisteredEmail() {
-        return prefs.getString(KEY_USER_EMAIL, "");
+        UserEntity user = getCurrentUser();
+        return user != null ? user.getEmail() : "";
     }
 
     public String getRegisteredPassword() {
-        return prefs.getString(KEY_USER_PASSWORD, "");
+        UserEntity user = getCurrentUser();
+        return user != null ? user.getPassword() : "";
     }
 
-    public void updateCredentials(String email, String password) {
-        prefs.edit()
-                .putString(KEY_USER_EMAIL, email)
-                .putString(KEY_USER_PASSWORD, password)
-                .apply();
+    public boolean updateCredentials(String email, String password) {
+        UserEntity user = getCurrentUser();
+        if (user == null) {
+            return false;
+        }
+
+        if (!email.equals(user.getEmail()) && isEmailInUse(email)) {
+            return false;
+        }
+
+        user.setEmail(email);
+        user.setPassword(password);
+        userDao.update(user);
+        return true;
     }
 
     public void setDarkModeEnabled(boolean enabled) {
-        prefs.edit().putBoolean(KEY_DARK_MODE_ENABLED, enabled).apply();
+        UserEntity user = getCurrentUser();
+        if (user == null) {
+            return;
+        }
+
+        user.setDarkModeEnabled(enabled);
+        userDao.update(user);
     }
 
     public boolean isDarkModeEnabled() {
-        return prefs.getBoolean(KEY_DARK_MODE_ENABLED, false);
+        UserEntity user = getCurrentUser();
+        return user != null && user.isDarkModeEnabled();
+    }
+
+    private UserEntity getCurrentUser() {
+        return userDao.getLoggedInUser();
     }
 }

@@ -34,7 +34,8 @@
     <string name="profile">Profile</string>
     <string name="logged_in_as">Logged in as:</string>
     <string name="password_value_label">Password:</string>
-    <string name="edit_credentials">Edit Email and Password</string>
+    <string name="edit_credentials">Update credentials</string>
+    <string name="edit_credentials_subtitle">Review and update your account details below.</string>
     <string name="show_favorites">Show Favorites Only</string>
     <string name="logout">Logout</string>
     <string name="save">Save</string>
@@ -43,6 +44,8 @@
     <string name="credentials_required">Email and password are required.</string>
     <string name="invalid_email_message">Please enter a valid email address.</string>
     <string name="password_minimum_message">Password must be at least 6 characters.</string>
+    <string name="email_already_registered_message">This email is already registered.</string>
+    <string name="email_already_in_use_message">This email is already in use by another account.</string>
     <string name="credentials_updated_message">Credentials updated successfully.</string>
     <string name="showing_favorites_message">Showing favorites only.</string>
     <string name="favorites_title">Favorite Movies</string>

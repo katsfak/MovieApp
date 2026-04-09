@@ -6,7 +6,7 @@ CineFlix lets users browse popular movies, open rich details, view reviews and s
 
 ## Features
 
-- User authentication flow (sign up, login, logout) using local storage
+- User authentication flow (sign up, login, logout) using a local Room database
 - Movie list screen with loading skeletons and pull-to-refresh
 - Movie details screen with:
   - poster and metadata
@@ -132,8 +132,9 @@ Navigation graph file: `app/src/main/res/navigation/my_graph.xml`
 
 ## Configuration and Security Notes
 
-- Current auth implementation uses `SharedPreferences` for demo/local state.
+- Current auth implementation uses a local Room database for demo/local state.
 - Credentials are stored locally and are not suitable for production security requirements.
+- Logout clears the current logged-in user flag from the local database.
 - TMDb API key is loaded from local `local.properties` (`TMDB_API_KEY`) into `BuildConfig` at build time.
 
 ## Troubleshooting

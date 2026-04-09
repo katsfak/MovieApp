@@ -1,15 +1,9 @@
 package com.example.movieapp.ui.profile;
 
-import android.app.AlertDialog;
 import android.os.Bundle;
-import android.text.InputType;
-import android.text.TextUtils;
-import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -23,6 +17,11 @@ import com.example.movieapp.databinding.FragmentProfileBinding;
 import com.example.movieapp.ui.auth.AuthViewModel;
 import com.example.movieapp.ui.auth.ProfileUiState;
 
+import dagger.hilt.android.AndroidEntryPoint;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.textfield.TextInputEditText;
+
+@AndroidEntryPoint
 public class ProfileFragment extends Fragment {
 
     private FragmentProfileBinding binding;
@@ -45,10 +44,8 @@ public class ProfileFragment extends Fragment {
 
         binding.editCredentialsButton.setOnClickListener(v -> showEditCredentialsDialog());
 
-        binding.showFavoritesButton.setOnClickListener(v -> {
-            Navigation.findNavController(v)
-                    .navigate(R.id.action_profileFragment_to_favoritesFragment);
-        });
+        binding.showFavoritesButton.setOnClickListener(
+                v -> Navigation.findNavController(v).navigate(R.id.action_profileFragment_to_favoritesFragment));
 
         binding.switchDarkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (!buttonView.isPressed()) {
@@ -57,58 +54,38 @@ public class ProfileFragment extends Fragment {
             viewModel.updateDarkMode(isChecked);
         });
 
-        binding.logoutButton.setOnClickListener(v -> {
-            new AlertDialog.Builder(requireContext())
-                    .setTitle(R.string.logout)
-                    .setMessage(R.string.logout_confirmation)
-                    .setPositiveButton(R.string.logout, (dialog, which) -> viewModel.logout())
-                    .setNegativeButton(R.string.cancel, null)
-                    .show();
-        });
+        binding.logoutButton.setOnClickListener(v -> new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.logout)
+                .setMessage(R.string.logout_confirmation)
+                .setPositiveButton(R.string.logout, (dialog, which) -> viewModel.logout())
+                .setNegativeButton(R.string.cancel, null)
+                .show());
 
         viewModel.profileUiState.observe(getViewLifecycleOwner(), this::renderState);
         viewModel.loadProfile();
     }
 
     private void showEditCredentialsDialog() {
-        LinearLayout container = new LinearLayout(requireContext());
-        container.setOrientation(LinearLayout.VERTICAL);
-        int pad = dp(16);
-        container.setPadding(pad, pad, pad, 0);
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_edit_credentials, null, false);
+        TextInputEditText emailInput = dialogView.findViewById(R.id.dialog_email_input);
+        TextInputEditText passwordInput = dialogView.findViewById(R.id.dialog_password_input);
 
-        EditText emailInput = new EditText(requireContext());
-        emailInput.setHint(getString(R.string.email_hint));
-        emailInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-        emailInput.setText(viewModel.getRawEmail());
-        emailInput.setLayoutParams(defaultInputLayoutParams());
+        if (emailInput != null) {
+            emailInput.setText(viewModel.getRawEmail());
+        }
+        if (passwordInput != null) {
+            passwordInput.setText(viewModel.getRawPassword());
+        }
 
-        EditText passwordInput = new EditText(requireContext());
-        passwordInput.setHint(getString(R.string.password_hint));
-        passwordInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        passwordInput.setText(viewModel.getRawPassword());
-        passwordInput.setLayoutParams(defaultInputLayoutParams());
-
-        container.addView(emailInput);
-        container.addView(passwordInput);
-
-        new AlertDialog.Builder(requireContext())
-                .setTitle(R.string.edit_credentials)
-                .setView(container)
+        new MaterialAlertDialogBuilder(requireContext())
+                .setView(dialogView)
                 .setPositiveButton(R.string.save, (dialog, which) -> {
-                    String newEmail = emailInput.getText().toString().trim();
-                    String newPassword = passwordInput.getText().toString().trim();
+                    String newEmail = String.valueOf(emailInput != null ? emailInput.getText() : null).trim();
+                    String newPassword = String.valueOf(passwordInput != null ? passwordInput.getText() : null).trim();
                     viewModel.updateCredentials(newEmail, newPassword);
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();
-    }
-
-    private LinearLayout.LayoutParams defaultInputLayoutParams() {
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.bottomMargin = dp(12);
-        return params;
     }
 
     private void renderState(ProfileUiState state) {
@@ -140,9 +117,6 @@ public class ProfileFragment extends Fragment {
         }
     }
 
-    private int dp(int value) {
-        return Math.round(value * requireContext().getResources().getDisplayMetrics().density);
-    }
 
     @Override
     public void onDestroyView() {
