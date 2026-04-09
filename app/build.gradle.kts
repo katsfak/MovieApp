@@ -13,7 +13,16 @@ val localProps = Properties().apply {
     }
 }
 
-val tmdbApiKey = localProps.getProperty("TMDB_API_KEY", "")
+val tmdbApiKeyRaw = localProps.getProperty("TMDB_API_KEY", "")
+val tmdbApiKey = tmdbApiKeyRaw
+    .trim()
+    .removeSuffix(";")
+    .removePrefix("\"")
+    .removeSuffix("\"")
+    .trim()
+val tmdbApiKeyEscaped = tmdbApiKey
+    .replace("\\", "\\\\")
+    .replace("\"", "\\\"")
 
 android {
     namespace = "com.example.movieapp"
@@ -27,7 +36,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "TMDB_API_KEY", "\"$tmdbApiKey\"")
+        buildConfigField("String", "TMDB_API_KEY", "\"$tmdbApiKeyEscaped\"")
     }
 
     buildTypes {
