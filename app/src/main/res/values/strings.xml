@@ -25,8 +25,12 @@
     <string name="all_reviews">All Reviews</string>
     <string name="email_hint">Email</string>
     <string name="password_hint">Password</string>
-    <string name="signup">SIGN UP</string>
-    <string name="login">LOGIN</string>
+    <string name="login_title">Welcome back</string>
+    <string name="login_subtitle">Sign in to continue to CineFlix.</string>
+    <string name="signup_title">Create your account</string>
+    <string name="signup_subtitle">Join CineFlix to save favorites and continue watching.</string>
+    <string name="signup">Sign up</string>
+    <string name="login">Log in</string>
     <string name="profile">Profile</string>
     <string name="logged_in_as">Logged in as:</string>
     <string name="password_value_label">Password:</string>
