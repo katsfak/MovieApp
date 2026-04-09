@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Light palette aligned with the original app look -->
+    <color name="brand_primary_light">#F2C438</color>
+    <color name="brand_on_primary_light">#191A40</color>
+    <color name="brand_section_light">#2D2C66</color>
+    <color name="brand_surface_light">#F5F7FA</color>
+    <color name="brand_surface_variant_light">#FFFFFF</color>
+    <color name="brand_on_surface_light">#191A40</color>
+    <color name="brand_on_surface_variant_light">#7A8190</color>
+    <color name="brand_outline_light">#E4E8EE</color>
+</resources>

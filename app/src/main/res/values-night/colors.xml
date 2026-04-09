@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark palette that keeps the same brand accent -->
+    <color name="brand_primary_light">#F2C438</color>
+    <color name="brand_on_primary_light">#1C1C1C</color>
+    <color name="brand_section_light">#B8B9FF</color>
+    <color name="brand_surface_light">#121317</color>
+    <color name="brand_surface_variant_light">#1E2026</color>
+    <color name="brand_on_surface_light">#F1F3F5</color>
+    <color name="brand_on_surface_variant_light">#B5BBC7</color>
+    <color name="brand_outline_light">#343A46</color>
+</resources>
