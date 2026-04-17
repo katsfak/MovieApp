@@ -10,7 +10,9 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.AndroidViewModel;
 
 import com.example.movieapp.data.network.NetworkUtil;
+import com.example.movieapp.domain.models.DetailsBasicUi;
 import com.example.movieapp.domain.models.MovieDetailsWithReviewsUi;
+import com.example.movieapp.domain.models.MovieUi;
 import com.example.movieapp.domain.usecase.DetailsUseCase;
 import com.example.movieapp.domain.usecase.GetMoviesUseCase;
 
@@ -84,6 +86,7 @@ public class DetailsViewModel extends AndroidViewModel {
                                 details -> {
                                     _isLoading.setValue(false);
                                     cancelRetryLoop();
+                                    cacheMovieForFavorites(details.getMovieDetails());
                                     _movieDetails.setValue(details);
                                 },
                                 throwable -> {
@@ -127,6 +130,30 @@ public class DetailsViewModel extends AndroidViewModel {
                             _error.postValue("Error updating favorite: " + throwable.getMessage());
                             Log.e("DetailsViewModel", "toggleFavorite", throwable);
                         });
+    }
+
+    private void cacheMovieForFavorites(DetailsBasicUi details) {
+        if (details == null) {
+            return;
+        }
+
+        MovieUi movieUi = new MovieUi(
+                details.getId(),
+                details.getTitle(),
+                details.getOverview(),
+                details.getPosterPath(),
+                details.getVoteAverage(),
+                false,
+                details.getBackdropPath(),
+                details.getReleaseDate());
+
+        disposables.add(
+                getMoviesUseCase.upsertMovie(movieUi)
+                        .subscribeOn(Schedulers.io())
+                        .subscribe(
+                                () -> {
+                                },
+                                throwable -> Log.w("DetailsViewModel", "cacheMovieForFavorites", throwable)));
     }
 
     @Override

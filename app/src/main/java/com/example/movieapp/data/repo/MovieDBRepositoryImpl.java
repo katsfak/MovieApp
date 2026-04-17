@@ -74,7 +74,13 @@ public class MovieDBRepositoryImpl implements MovieDBRepository {
     /** Completable wraps the Room insert — no raw new Thread(). */
     @Override
     public Completable insertMovie(MovieEntity movie) {
-        return Completable.fromAction(() -> movieDao.insert(movie))
+        return Completable.fromAction(() -> {
+            MovieEntity existing = movieDao.getMovieById(movie.getId()).blockingGet();
+            if (existing != null && existing.isFavorite()) {
+                movie.setFavorite(true);
+            }
+            movieDao.insert(movie);
+        })
                 .subscribeOn(Schedulers.io());
     }
 

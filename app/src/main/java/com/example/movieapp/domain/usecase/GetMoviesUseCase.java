@@ -52,4 +52,8 @@ public class GetMoviesUseCase {
     public Completable toggleFavorite(int movieId) {
         return repository.toggleFavorite(movieId);
     }
+
+    public Completable upsertMovie(MovieUi movie) {
+        return repository.insertMovie(MovieEntityMapper.mapToMovieEntity(movie));
+    }
 }
